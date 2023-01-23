@@ -1,0 +1,5 @@
+*.sqlite3
+my_README.md
+__pycache__
+*.pyc
+parties/partyfinder/migrations/*.py

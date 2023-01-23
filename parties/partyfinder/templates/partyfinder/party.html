@@ -1,0 +1,15 @@
+<h2>PartyFinder - Details for "<a href="{% url 'partyfinder:parties' party.city %}">{{ party.city }}</a>/{{ party.id }}"</h2>
+<hr>
+
+<p>
+  <strong>Name</strong>: {{ party.name }}
+  (<a href="{% url 'partyfinder:delete_party' party.city party.id %}">del</a>)
+</p>
+<p>
+  <strong>Date</strong>: {{ party.date | date:'M d, Y' }}
+</p>
+
+<hr>
+<a href="{% url 'partyfinder:index' %}">Home</a>
+-
+<a href="{% url 'partyfinder:new_party' %}?city={{ party.city }}">New</a>

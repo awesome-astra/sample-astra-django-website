@@ -1,0 +1,11 @@
+<h2>PartyFinder - New Item</h2>
+<hr>
+
+<form action="{% url 'partyfinder:new_party' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Post">
+</form>
+
+<hr>
+<a href="{% url 'partyfinder:index' %}">Home</a>

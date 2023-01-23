@@ -1,0 +1,23 @@
+<h2>PartyFinder - Parties for "{{ city }}:"</h2>
+<hr>
+
+{% if parties %}
+  <ul>
+    {% for party in parties %}
+    <li>
+      <span style="color: #909090;">{{ party.date | date:'M d, Y' }}</span>
+      <a href="{% url 'partyfinder:party' city party.id %}">{{party.name}}</a>
+      <span style="margin-left: 15px;">
+        <a href="{% url 'partyfinder:delete_party' city party.id %}">[X]</a>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Nothing turned up.</p>
+{% endif %}
+
+<hr>
+<a href="{% url 'partyfinder:index' %}">Home</a>
+-
+<a href="{% url 'partyfinder:new_party' %}?city={{ city }}">New</a>
