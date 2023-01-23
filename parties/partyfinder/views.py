@@ -1,3 +1,4 @@
+import uuid
 import datetime
 
 from django.shortcuts import render
@@ -32,13 +33,16 @@ def index(request):
   )
 
 def party(request, city, id):
+  # are we here with a "could not update 'people'" message to display?
+  lwt_failed = request.GET.get('LWT_FAILED', False)
+  #
   parties = Party.objects.filter(city=city, id=id)
   if len(parties)> 0:
     party = parties[0]
     context = {
       'party': party,
+      'lwt_failed': lwt_failed,
     }
-    print(party)
     return render(
       request,
       'partyfinder/party.html',
@@ -82,6 +86,7 @@ def new_party(request):
     if default_city is not None:
       f_initial['city'] = default_city
     f_initial['date'] = datetime.datetime.now()
+    f_initial['people'] = 0
     #
     form = PartyForm(initial=f_initial)
   return render(
@@ -106,3 +111,32 @@ def delete_party(request, city, id):
     ))
   else:
     raise Http404
+
+def change_party_people(request, city, id, prev_value, delta):
+  # A LWT is a way to ensure no surprising race conditions:
+  # we can ensure the provided prev_value still matches the column
+  delta_num = int(delta)
+  #
+  from django.db import connection
+  cursor = connection.cursor()
+  change_applied = cursor.execute(
+    'UPDATE party SET people = %s WHERE city=%s AND id=%s IF people = %s',
+    (
+      delta_num + prev_value,
+      city,
+      uuid.UUID(id),  # must respect Cassandra type system
+      prev_value,
+    ),
+  ).one()['[applied]']
+  if not change_applied:
+    lwt_message = '?LWT_FAILED=1'
+  else:
+    lwt_message = ''
+  #
+  return HttpResponseRedirect(reverse(
+    'partyfinder:party',
+    kwargs={
+      'city': city,
+      'id': id,
+    },
+  ) + lwt_message)

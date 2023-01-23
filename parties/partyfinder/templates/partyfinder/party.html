@@ -1,12 +1,22 @@
 <h2>PartyFinder - Details for "<a href="{% url 'partyfinder:parties' party.city %}">{{ party.city }}</a>/{{ party.id }}"</h2>
 <hr>
 
+{% if lwt_failed %}
+<p style="color: red;">
+  Could not update the "people" field. Please try again.
+</p>
+{% endif %}
 <p>
   <strong>Name</strong>: {{ party.name }}
   (<a href="{% url 'partyfinder:delete_party' party.city party.id %}">del</a>)
 </p>
 <p>
   <strong>Date</strong>: {{ party.date | date:'M d, Y' }}
+</p>
+<p>
+  <strong>People</strong>: {{ party.people }}
+  <a href="{% url 'partyfinder:change_party_people' party.city party.id party.people '+1' %}" style="margin-left: 20px;"><button type="button">+1</button></a>
+  {% if party.people > 0 %}<a href="{% url 'partyfinder:change_party_people' party.city party.id party.people '-1' %}"><button type="button">-1</button></a>{% endif %}
 </p>
 
 <hr>

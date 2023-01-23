@@ -16,6 +16,7 @@ class Party(DjangoCassandraModel):
     default=uuid.uuid4,
   )
   name = columns.Text()
+  people = columns.Integer(default=0)
   date = columns.DateTime(default=timezone.now)
 
   class Meta:
