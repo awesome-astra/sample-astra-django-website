@@ -1,4 +1,5 @@
 *.sqlite3
+.env
 my_README.md
 __pycache__
 *.pyc

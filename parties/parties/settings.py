@@ -10,11 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+from cassandra.auth import PlainTextAuthProvider
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / '../.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -31,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_cassandra_engine',
     'partyfinder.apps.PartyfinderConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -74,13 +80,26 @@ WSGI_APPLICATION = 'parties.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+CASSANDRA_FALLBACK_ORDER_BY_PYTHON = True
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django_cassandra_engine',
+        'NAME': os.environ['ASTRA_DB_KEYSPACE'], # keyspace name
+        'OPTIONS': {
+            'connection': {
+                'auth_provider': PlainTextAuthProvider(
+                    'token',
+                    os.environ['ASTRA_DB_APPLICATION_TOKEN'],
+                    # Alternatively: user=ClientID from token and password=ClientSecret from token
+                ),
+                'cloud': {
+                    'secure_connect_bundle': os.environ['ASTRA_DB_SECURE_BUNDLE_PATH'],
+                },
+            }
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

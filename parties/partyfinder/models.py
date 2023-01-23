@@ -1,15 +1,22 @@
 import uuid
 
-from django.db import models
 from django.utils import timezone
 
+from cassandra.cqlengine import columns
+from django_cassandra_engine.models import DjangoCassandraModel
+
 # A model for this app
-class Party(models.Model):
-  id = models.UUIDField(
-    primary_key = True,
-    default = uuid.uuid4,
-    editable = False,
+class Party(DjangoCassandraModel):
+  city = columns.Text(
+    primary_key=True,
   )
-  city = models.CharField(max_length=50)
-  name = models.CharField(max_length=200)
-  date = models.DateTimeField(default=timezone.now)
+  id = columns.UUID(
+    primary_key=True,
+    clustering_order='asc', # (allowed: 'asc' , 'desc', lowercase)
+    default=uuid.uuid4,
+  )
+  name = columns.Text()
+  date = columns.DateTime(default=timezone.now)
+
+  class Meta:
+    get_pk_field='id'
