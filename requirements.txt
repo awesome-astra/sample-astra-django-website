@@ -1,4 +1,3 @@
-cassandra-driver==3.25.0
 Django==4.1.5
 django-cassandra-engine==1.7.0
 python-dotenv==0.21.1
