@@ -1,6 +1,8 @@
 # Sample Django app with Astra DB
 
-This is a simple [Django](https://docs.djangoproject.com/en/4.1/) application to illustrate how to use Astra DB as database backend. The code is ready to run (provided you first go
+This is a simple [Django](https://docs.djangoproject.com/en/4.1/) application to illustrate how to use
+[Astra DB](https://astra.datastax.com/)
+as database backend. The code is ready to run (provided you first go
 through the setup).
 
 _Note: Astra DB is a database-as-a-service in the cloud built on [Apache Cassandra™](https://cassandra.apache.org)._
@@ -63,21 +65,21 @@ forever and still use a pretty generous amount of storage and monthly reads/writ
 
 Then
 [create a database](https://awesome-astra.github.io/docs/pages/astra/create-instance/)
-(at the time of writing, a newly-created Free Tier
+(note that, at the time of writing, a newly-created Free Tier
 account covers some regions on specific cloud providers). In the following we'll call the database `mydatabase` and the keyspace `mydjango`.
 
 Go to your settings,
 [create a **Database Administrator** token](https://awesome-astra.github.io/docs/pages/astra/create-token/)
 and save it somewhere safe.
-_In a production application you will want to limit your token's permissions more accurately according to the least-privilege principle, but this is a demo and it's convenient to let the command-line automation handle most of the setup for you._
+_In a production application you will want to limit your token's permissions more accurately according to the least-privilege principle, but it is convenient, for this demo, to let the command-line automation handle most of the setup for you._
 
-You must now prepare a `.env` file for the Django application. the quickest way is using the
+You must now prepare a `.env` file for the Django application. The quickest way is using the
 [Astra CLI](https://awesome-astra.github.io/docs/pages/astra/astra-cli/)
 automation:
 
-- install `Astra CLI` with xxx;
-- re-open your shell;
-- type `astra setup` and when prompted enter your token, the string starting with `AstraCS:...`;
+- install `Astra CLI` ([instructions](https://awesome-astra.github.io/docs/pages/astra/astra-cli/#installation));
+- (open a new shell if required;)
+- run `astra setup` and, when prompted, enter your token: it is the string starting with `AstraCS:...`;
 - have the CLI download the [Secure Connect Bundle](https://awesome-astra.github.io/docs/pages/astra/download-scb/) and generate the dot-env for you: `astra db create-dotenv mydatabase -k mydjango`.
 
 > Alternatively to using the CLI, you can (a) download the SCB to a known path location,
@@ -109,9 +111,7 @@ python manage.py sync_cassandra
 python manage.py syncdb
 ```
 
-_Note: do not mind warnings about "unapplied migrations": the commands above
-take care of what is needed at DB level. In fact, the `migrate` command is
-not even supported by `django-cassandra-engine`.
+_Note: you can ignore warnings about "unapplied migrations": the commands above take care of what is needed at DB level. In fact, the `migrate` command is not even supported by `django-cassandra-engine`._
 
 
 
@@ -134,6 +134,19 @@ You can visit the application at `http://127.0.0.1:8000/`:
 - delete some items;
 - view details of a party. There will be `+1` and `-1` buttons to alter the participant count: try them.
 
-Now check the LWT at work: view details for the same party in two browser tabs at once and try to change the participant count in one, then the other without refreshing the page. The app will refuse to perform the update.
+Now check the "Lightweight Transaction (LWT)" at work: view details for the same party in two browser tabs at once and try to change the participant count in one, then the other without refreshing the page. The app will refuse to perform the update.
 
-That's it! You should inspect the code to find out more, or visit the [Awesome Astra page](https://awesome-astra.github.io/docs/pages/develop/frameworks/django/) for more information.
+That's it! You can inspect the code to find out more, or visit the [Awesome Astra page](https://awesome-astra.github.io/docs/pages/develop/frameworks/django/) for more information.
+
+### Troubleshooting
+
+1. If you use this project as starting point for your application, please
+be mindful of the secret key `SECRET_KEY` currently in `settings.py`:
+first, it is unsafe to leave it checked in the repo
+(use a different mechanism to inject it), and second, change it first!
+
+2. If the application fails to start with nothing else than a
+`Segmentation fault (core dumped)` error message, try:
+
+- making sure your DB is not in the "Hibernated" state (it happens to free-tier Astra DB instances after some time; in that case, go to the Astra UI and ["Resume" it back to life](https://awesome-astra.github.io/docs/pages/astra/resume-db/), or alternatively have Astra CLI do it for you with `astra db resume <DB_NAME>`);
+- running the `sync_cassandra => syncdb` initialization commands before retrying.
