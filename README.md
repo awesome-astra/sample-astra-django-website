@@ -108,7 +108,6 @@ used in the application. This step will create the necessary table.
 ```
 cd parties
 python manage.py sync_cassandra
-python manage.py syncdb
 ```
 
 _Note: you can ignore warnings about "unapplied migrations": the commands above take care of what is needed at DB level. In fact, the `migrate` command is not even supported by `django-cassandra-engine`._
