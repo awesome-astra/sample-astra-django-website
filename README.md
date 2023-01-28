@@ -134,19 +134,19 @@ You can visit the application at `http://127.0.0.1:8000/`:
 - delete some items;
 - view details of a party. There will be `+1` and `-1` buttons to alter the participant count: try them.
 
-Now check the "Lightweight Transaction (LWT)" at work: view details for the same party in two browser tabs at once and try to change the participant count in one, then the other without refreshing the page. The app will refuse to perform the update.
+Now check the Lightweight Transaction (LWT) mechanism at work: view details for the same party in two browser tabs at once and try to change the participant count in one, then the other without refreshing the page. The app will refuse to perform the update.
 
 That's it! You can inspect the code to find out more, or visit the [Awesome Astra page](https://awesome-astra.github.io/docs/pages/develop/frameworks/django/) for more information.
 
-### Troubleshooting
+### Troubleshooting & caveats
 
 1. If you use this project as starting point for your application, please
-be mindful of the secret key `SECRET_KEY` currently in `settings.py`:
+be mindful of Django's `SECRET_KEY`, currently given in plaintext in `settings.py`:
 first, it is unsafe to leave it checked in the repo
-(use a different mechanism to inject it), and second, change it first!
+(use a different mechanism to inject it), and second, change it!
 
 2. If the application fails to start with nothing else than a
 `Segmentation fault (core dumped)` error message, try:
 
-- making sure your DB is not in the "Hibernated" state (it happens to free-tier Astra DB instances after some time; in that case, go to the Astra UI and ["Resume" it back to life](https://awesome-astra.github.io/docs/pages/astra/resume-db/), or alternatively have Astra CLI do it for you with `astra db resume <DB_NAME>`);
+- making sure your DB is not in the "Hibernated" state (Astra DB instances on the Free Tier go dormant after some inactivity time; in that case, go to the Astra UI and ["Resume" it back to life](https://awesome-astra.github.io/docs/pages/astra/resume-db/), or alternatively have Astra CLI do it for you with `astra db resume <DB_NAME>`);
 - running the `sync_cassandra => syncdb` initialization commands before retrying.
