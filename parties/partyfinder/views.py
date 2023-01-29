@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.urls import reverse
+from django.db import connection
 
 from .models import Party
 from .forms import PartyForm, CityForm
@@ -117,7 +118,6 @@ def change_party_people(request, city, id, prev_value, delta):
   # we can ensure the provided prev_value still matches the column
   delta_num = int(delta)
   #
-  from django.db import connection
   cursor = connection.cursor()
   change_applied = cursor.execute(
     'UPDATE party SET people = %s WHERE city=%s AND id=%s IF people = %s',
